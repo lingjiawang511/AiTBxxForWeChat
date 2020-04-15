@@ -10,13 +10,13 @@ Page({
     characteristics: {},
     connected: true,
   },
-  bindInput: function(e) {
+  bindInput: function (e) {
     this.setData({
       inputText: e.detail.value
     })
     console.log(e.detail.value)
   },
-  SendTap: function() {
+  SendTap: function () {
     var that = this
     if (that.data.connected) {
       var buffer = new ArrayBuffer(that.data.inputText.length)
@@ -29,7 +29,7 @@ Page({
         serviceId: that.data.serviceId,
         characteristicId: that.data.characteristics[0].uuid,
         value: buffer,
-        success: function(res) {
+        success: function (res) {
           console.log('发送成功')
         }
       })
@@ -38,7 +38,7 @@ Page({
         title: '提示',
         content: '蓝牙已断开',
         showCancel: false,
-        success: function(res) {
+        success: function (res) {
           that.setData({
             searching: false
           })
@@ -46,33 +46,39 @@ Page({
       })
     }
   },
-  onLoad: function(options) {
+  onLoad: function (options) {
     var that = this
     console.log(options)
     that.setData({
       name: options.name,
       connectedDeviceId: options.connectedDeviceId
     })
+    console.log("DevicedID: " + that.data.connectedDeviceId)
     wx.getBLEDeviceServices({
       deviceId: that.data.connectedDeviceId,
-      success: function(res) {
+      success: function (res) {
         var all_UUID = res.services;
         var index_uuid = -1;
         var UUID_lenght = all_UUID.length;
         /* 遍历服务数组 */
+        console.log("UUID Length: " + UUID_lenght)
         for (var index = 0; index < UUID_lenght; index++) {
           var ergodic_UUID = all_UUID[index].uuid; //取出服务里面的UUID
           /* 判断是否是我们需要的00010203-0405-0607-0809-0A0B0C0D1910*/
-          if (ergodic_UUID == '00010203-0405-0607-0809-0A0B0C0D1910') {
+          console.log("Sellet deviced UUID: " + ergodic_UUID)
+          index_uuid = index;
+          /*
+          if (ergodic_UUID == '0000FFE0-0000-1000-8000-00805F9B34FB') {
             index_uuid = index;
           };
+          */
         };
         if (index_uuid == -1) {
           wx.showModal({
             title: '提示',
             content: '非我方出售的设备',
             showCancel: false,
-            success: function(res) {
+            success: function (res) {
               that.setData({
                 searching: false
               })
@@ -85,7 +91,7 @@ Page({
         wx.getBLEDeviceCharacteristics({
           deviceId: options.connectedDeviceId,
           serviceId: res.services[index_uuid].uuid,
-          success: function(res) {
+          success: function (res) {
             that.setData({
               characteristics: res.characteristics
             })
@@ -94,7 +100,7 @@ Page({
               deviceId: options.connectedDeviceId,
               serviceId: that.data.serviceId,
               characteristicId: that.data.characteristics[0].uuid,
-              success: function(res) {
+              success: function (res) {
                 console.log('启用notify成功')
               },
               fail(res) {
@@ -105,13 +111,13 @@ Page({
         })
       }
     })
-    wx.onBLEConnectionStateChange(function(res) {
+    wx.onBLEConnectionStateChange(function (res) {
       console.log(res.connected)
       that.setData({
         connected: res.connected
       })
     })
-    wx.onBLECharacteristicValueChange(function(res) {
+    wx.onBLECharacteristicValueChange(function (res) {
       console.log('接收到数据：' + app.buf2string(res.value))
       var time = that.getNowTime()
       that.setData({
@@ -119,29 +125,28 @@ Page({
       })
     })
   },
-  onUnload: function() {
+  onUnload: function () {
     wx.closeBLEConnection({
       deviceId: this.data.connectedDeviceId,
-      success: function(res) {},
+      success: function (res) { },
     })
   },
-   SendCleanTap: function() {
+  SendCleanTap: function () {
     this.setData({
       inputText: ''
     })
   },
-
   RecvCleanTap: function () {
     this.setData({
       receiveText: ''
     })
   },
-   SendValue:function(e){
+  SendValue: function (e) {
     this.setData({
-      inputText:e.detail.value
+      inputText: e.detail.value
     })
   },
-  getNowTime: function() {
+  getNowTime: function () {
     // 加0
     function add_10(num) {
       if (num < 10) {

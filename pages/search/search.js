@@ -10,6 +10,7 @@ Page({
       wx.closeBluetoothAdapter({
         complete: function(res) {
           console.log(res)
+          console.log("I will open bluetooth")
           wx.openBluetoothAdapter({
             success: function(res) {
               console.log(res)
@@ -18,10 +19,12 @@ Page({
                   console.log(res)
                 }
               })
+              console.log("I will search other bluetooth")
               wx.startBluetoothDevicesDiscovery({
                 allowDuplicatesKey: false,
                 success: function(res) {
                   console.log(res)
+                  console.log("I have successed search bluetooth")
                   that.setData({
                     searching: true,
                     devicesList: []
@@ -119,7 +122,7 @@ Page({
     wx.onBluetoothDeviceFound(function(devices) {
       //剔除重复设备，过滤名字是否为 Ai-Thinker 
       var isnotexist = true
-      if (devices.deviceId) {
+      if (devices.devices.deviceId) {
         if (devices.advertisData) {
           devices.advertisData = app.buf2hex(devices.advertisData)
         } else {
@@ -131,7 +134,8 @@ Page({
             isnotexist = false
           }
         }
-        if (isnotexist && devices[0].name === 'Ai-Thinker') {
+        if (isnotexist && devices[0].name !== '') {
+          console.log("I have success search the same name bluetooth 1")
           that.data.devicesList.push(devices[0])
         }
       } else if (devices.devices) {
@@ -146,10 +150,12 @@ Page({
             isnotexist = false
           }
         }
-        if (isnotexist && devices.devices[0].name === 'Ai-Thinker') {
+        //that.data.devicesList.push(devices.devices[0])
+        if (isnotexist && devices.devices[0].name !== '') {
+          console.log("I have success search the same name bluetooth 2")
           that.data.devicesList.push(devices.devices[0])
         }
-      } else if (devices[0]) {
+      } else if (devices.devices[0]) {
         if (devices[0].advertisData) {
           devices[0].advertisData = app.buf2hex(devices[0].advertisData)
         } else {
@@ -160,8 +166,9 @@ Page({
           if (devices[0].deviceId == that.data.devicesList[i].deviceId) {
             isnotexist = false
           }
-        }
-        if (isnotexist && devices[0].name === 'Ai-Thinker') {
+        } 
+        if (isnotexist && devices[0].name !== '') {
+          console.log("I have success search the same name bluetooth 3")
           that.data.devicesList.push(devices[0])
         }
       }
